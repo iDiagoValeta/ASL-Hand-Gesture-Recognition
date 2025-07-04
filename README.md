@@ -20,6 +20,14 @@ The system is built with Python, using MediaPipe for hand landmark detection and
     3.  Model Training
     4.  Real-Time Inference
 
+## 📸 In Action
+
+Here's a demonstration of the model recognizing the letters to spell the name "NACHO" and the "BLANK" state when no hand is present.
+
+| N | A | C | H | O | BLANK |
+| :---: | :---: | :---: | :---: | :---: | :---: |
+| ![N](photos/N.png) | ![A](photos/A.png) | ![C](photos/C.png) | ![H](photos/H.png) | ![O](photos/O.png) | ![BLANK](photos/BLANK.png) |
+
 ## ⚙️ How It Works
 
 The project follows a standard machine learning pipeline:
@@ -123,6 +131,7 @@ Point your hand at the webcam, and the application will start recognizing the si
 ```
 .
 ├── data/                     # Directory for collected images (created automatically)
+├── photos/                   # Directory for demo images.
 ├── collect_imgs.py           # Step 1: Script to collect image samples for each sign.
 ├── create_dataset.py         # Step 2: Script to process images and create a landmark dataset.
 ├── train_classifier.py       # Step 3 (Option A): Trains a RandomForest model.
