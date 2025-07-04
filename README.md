@@ -2,21 +2,6 @@
 
 This project implements an American Sign Language (ASL) classifier using **MediaPipe** for hand landmark detection and a deep learning model (TensorFlow/Keras) for classification. It allows you to collect your own ASL alphabet dataset, train a classifier, and perform real-time sign language inference using your webcam.
 
-## Table of Contents
-
-- [Features](#features)
-- [Project Structure](#project-structure)
-- [Setup and Installation](#setup-and-installation)
-- [Usage](#usage)
-  - [1. Collect Images](#1-collect-images)
-  - [2. Create Dataset](#2-create-dataset)
-  - [3. Train the Deep Classifier](#3-train-the-deep-classifier)
-  - [4. Real-time Inference](#4-real-time-inference)
-- [Key Bindings in Inference](#key-bindings-in-inference)
-- [Model Details](#model-details)
-- [Contributing](#contributing)
-- [License](#license)
-
 ## Features
 
 - **Dataset Collection**: Easily collect images for each ASL sign (A-Z and BLANK) using your webcam.
