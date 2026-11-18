@@ -1,143 +1,69 @@
-# Real-Time Sign Language Alphabet Recognition 🤟
+# ASL Hand Gesture Recognition
 
-This project is a real-time American Sign Language (ASL) alphabet recognizer. It uses your computer's webcam to detect hand gestures, translates them into the corresponding letter of the alphabet, and allows you to form words and sentences.
+**A real-time webcam recognizer for the American Sign Language (ASL) alphabet that turns held hand signs into letters and words, with a Random Forest and a Keras neural network as interchangeable classifiers.**
 
-The system is built with Python, using MediaPipe for hand landmark detection and offers two different machine learning models for classification:
-1.  A `RandomForestClassifier` from Scikit-learn (a classic, fast approach).
-2.  A deep neural network built with `TensorFlow/Keras` (a more powerful, deep learning approach).
+> **Context.** Built in July 2025 as a personal project, one of my first public repositories, while I was studying Computer Engineering at UPV and had just finished working as a guide at the UPV Computer Museum. It is a small, complete machine learning pipeline (collect, extract, train, infer) written before I worked at Grupo CEU or Auro AI and before I used coding agents; it is kept as it was written and the code is not maintained.
 
-## ✨ Features
+![Demo frames of the recognizer showing the letters N, A, C, H, O and the BLANK state](photos/N.png)
 
--   **Real-Time Detection**: Recognizes 26 ASL alphabet signs and a 'BLANK' state (no hand) directly from your webcam feed.
--   **Word Building Logic**: Assembles recognized letters into words. A letter is added after being held steady for 3 seconds. The word is cleared if a 'BLANK' state is held for 5 seconds.
--   **Interactive Controls**:
-    -   `q`: Quit the application.
-    -   `c`: Clear the last character.
-    -   `spacebar`: Add a space to the current word.
--   **Complete ML Pipeline**: Includes scripts for every step of the process:
-    1.  Image Collection
-    2.  Dataset Creation
-    3.  Model Training
-    4.  Real-Time Inference
+The `photos/` folder holds one capture per recognized state (N, A, C, H, O and BLANK), taken while spelling "NACHO".
 
-## 📸 In Action
+## What it does
 
-Here's a demonstration of the model recognizing the letters to spell the name "NACHO" and the "BLANK" state when no hand is present.
+- Recognizes the 26 letters of the ASL alphabet plus a `BLANK` class (no hand) from the webcam in real time.
+- Draws the MediaPipe hand landmarks, a bounding box and the predicted letter on the video frame.
+- Builds words: a letter is appended after the same sign is held for 3 seconds, and the word is cleared after `BLANK` is held for 5 seconds.
+- Keyboard controls: `q` quits, `c` deletes the last character, space adds a space.
+- Includes every step of the pipeline as a script: image collection, dataset creation, training and inference.
+- Offers two classifiers over the same features: a scikit-learn `RandomForestClassifier` and a Keras dense network.
 
-| N | A | C | H | O | BLANK |
-| :---: | :---: | :---: | :---: | :---: | :---: |
-| ![N](photos/N.png) | ![A](photos/A.png) | ![C](photos/C.png) | ![H](photos/H.png) | ![O](photos/O.png) | ![BLANK](photos/BLANK.png) |
+## How it works
 
-## ⚙️ How It Works
+1. `collect_imgs.py` captures 500 webcam frames for each of the 27 classes (A to Z and BLANK) into `data/<class>/`.
+2. `create_dataset.py` runs MediaPipe Hands on every image, takes the 21 hand landmarks, and normalizes the x and y coordinates by the bounding box of the landmarks (42 features per sample). `BLANK` images where no hand is found become a vector of zeros. The result is saved to `data.pickle`.
+3. `train_classifier.py` splits the data 80/20 (stratified, `random_state=42`), fits a `RandomForestClassifier` and saves it with its `LabelEncoder` to `model.p`.
+4. `train_deep_classifier.py` trains a Keras `Sequential` model (Dense 128, Dropout 0.3, Dense 64, Dropout 0.3, softmax output) for 50 epochs with batch size 32 and saves `deep_model.h5` and `label_encoder.pkl`.
+5. `inference_classifier.py` and `deep_inference_classifier.py` read the webcam, extract and normalize the landmarks the same way, predict with the chosen model and apply the word-building timers.
 
-The project follows a standard machine learning pipeline:
+## Results
 
-1.  **Data Collection (`collect_imgs.py`)**: A script to capture images of each ASL sign from your webcam. It creates a dataset of images organized into folders for each class (A, B, C, ..., Z, BLANK).
-2.  **Dataset Creation (`create_dataset.py`)**: This script processes the collected images. It uses `MediaPipe` to detect the 21 hand landmarks for each hand in an image, normalizes their coordinates, and saves them into a single `data.pickle` file.
-3.  **Model Training (`train_classifier.py` / `train_deep_classifier.py`)**: You can choose your model. The script loads the `data.pickle` file and trains a classifier to recognize the sign based on the landmark data.
-    -   `train_classifier.py` trains a `RandomForestClassifier`.
-    -   `train_deep_classifier.py` trains a `Keras` neural network.
-4.  **Inference (`inference_classifier.py` / `deep_inference_classifier.py`)**: The final step. This script opens your webcam, captures frames in real-time, uses MediaPipe to extract landmarks, and feeds them into your trained model to get a prediction, which is then displayed on the screen.
+The repository does not contain evaluation output (no logs, metrics or reports). The training scripts print test accuracy when run, but no numbers are recorded here. The repository does ship pre-trained files (`data.pickle`, `model.p`, `deep_model.h5`, `label_encoder.pkl`).
 
-## 🚀 Getting Started
+## Run it
 
-Follow these instructions to set up the project and run it on your local machine.
-
-### Prerequisites
-
-You need to have **Anaconda** or **Miniconda** installed on your system to manage the environment and dependencies.
-
-### 1. Create and Activate the Conda Environment
-
-First, clone the repository. Then, open your Anaconda Prompt or terminal and run the following commands to create a dedicated environment. We recommend using Python 3.9 for broad compatibility.
+Not run again while writing this README; the commands come from the scripts and `requirements.txt`. Needs a webcam. The README originally recommended Python 3.9 in a conda environment.
 
 ```bash
-# Create a new conda environment named 'sign_language' with Python 3.9
 conda create --name sign_language python=3.9
-
-# Activate the newly created environment
 conda activate sign_language
-```
-
-### 2. Install Dependencies
-
-With the environment activated, install all the required libraries using the provided `requirements.txt` file.
-
-```bash
-# Install all dependencies
 pip install -r requirements.txt
-```
 
-## 📋 Usage - Step-by-Step
+python collect_imgs.py          # press Q to start each letter, 500 images per class
+python create_dataset.py        # writes data.pickle
 
-To run the project, you must follow these steps in order.
-
-### Step 1: Collect Image Data
-
-Run the `collect_imgs.py` script. It will prompt you to get ready to show the sign for each letter of the alphabet. Press `Q` when you are ready to start collecting images for that specific letter. The script will automatically capture 500 images for each sign.
-
-```bash
-python collect_imgs.py
-```
-
-### Step 2: Create the Dataset from Images
-
-After collecting the images, you need to process them to extract the hand landmarks. This script will create the `data.pickle` file that the models will use for training.
-
-```bash
-python create_dataset.py
-```
-
-### Step 3: Train the Model
-
-You have two options for training. Choose one.
-
-**Option A: Train the RandomForest Model**
-
-This is a faster, classic machine learning approach. It saves the trained model as `model.p`.
-
-```bash
-python train_classifier.py
-```
-
-**Option B: Train the Deep Learning Model**
-
-This uses a neural network and may yield higher accuracy. It saves the model as `deep_model.h5` and the label encoder as `label_encoder.pkl`.
-
-```bash
-python train_deep_classifier.py
-```
-
-### Step 4: Run the Real-Time Recognition
-
-Now you're ready to see the magic! Run the inference script that corresponds to the model you trained in the previous step.
-
-**If you trained with Option A (RandomForest):**
-
-```bash
+python train_classifier.py      # Random Forest, writes model.p
 python inference_classifier.py
-```
 
-**If you trained with Option B (Deep Learning):**
-
-```bash
+# or the neural network
+python train_deep_classifier.py # writes deep_model.h5 and label_encoder.pkl
 python deep_inference_classifier.py
 ```
 
-Point your hand at the webcam, and the application will start recognizing the signs!
+The pre-trained model files in the repository let you skip the first four commands, but they were produced with the author's own images and camera, so results with a different setup are not guaranteed.
 
-## 📂 Project Structure
+## Repository layout
 
 ```
-.
-├── data/                     # Directory for collected images (created automatically)
-├── photos/                   # Directory for demo images.
-├── collect_imgs.py           # Step 1: Script to collect image samples for each sign.
-├── create_dataset.py         # Step 2: Script to process images and create a landmark dataset.
-├── train_classifier.py       # Step 3 (Option A): Trains a RandomForest model.
-├── train_deep_classifier.py  # Step 3 (Option B): Trains a Keras/TensorFlow model.
-├── inference_classifier.py   # Step 4 (Option A): Runs real-time inference with the RandomForest model.
-├── deep_inference_classifier.py # Step 4 (Option B): Runs real-time inference with the Keras model.
-├── requirements.txt          # List of Python dependencies.
-└── README.md                 # This file.
+collect_imgs.py                # capture training images from the webcam
+create_dataset.py              # MediaPipe landmarks to normalized features (data.pickle)
+train_classifier.py            # Random Forest training (model.p)
+train_deep_classifier.py       # Keras training (deep_model.h5, label_encoder.pkl)
+inference_classifier.py        # real-time inference with the Random Forest
+deep_inference_classifier.py   # real-time inference with the Keras model
+requirements.txt               # pinned dependencies
+photos/                        # demo captures (N, A, C, H, O, BLANK)
 ```
+
+## Stack
+
+Python, MediaPipe Hands, OpenCV, scikit-learn, TensorFlow/Keras, NumPy.
