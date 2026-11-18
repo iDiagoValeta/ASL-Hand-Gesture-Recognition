@@ -4,9 +4,9 @@
 
 > **Context.** Built in July 2025 as a personal project, one of my first public repositories, while I was studying Computer Engineering at UPV and had just finished working as a guide at the UPV Computer Museum. It is a small, complete machine learning pipeline (collect, extract, train, infer) written before I worked at Grupo CEU or Auro AI and before I used coding agents; it is kept as it was written and the code is not maintained.
 
-![Demo frames of the recognizer showing the letters N, A, C, H, O and the BLANK state](photos/N.png)
+![Webcam frame of the recognizer showing the sign N with hand landmarks, a bounding box and the word being built](photos/N.png)
 
-The `photos/` folder holds one capture per recognized state (N, A, C, H, O and BLANK), taken while spelling "NACHO".
+The `photos/` folder holds one capture per recognized state (N, A, C, H, O and BLANK).
 
 ## What it does
 
@@ -31,7 +31,7 @@ The repository does not contain evaluation output (no logs, metrics or reports).
 
 ## Run it
 
-Not run again while writing this README; the commands come from the scripts and `requirements.txt`. Needs a webcam. The README originally recommended Python 3.9 in a conda environment.
+Not run again while writing this README; the commands come from the scripts and `requirements.txt`. Needs a webcam. Python 3.9 in a conda environment is what the previous README recommended; no other Python version was checked.
 
 ```bash
 conda create --name sign_language python=3.9
@@ -49,7 +49,7 @@ python train_deep_classifier.py # writes deep_model.h5 and label_encoder.pkl
 python deep_inference_classifier.py
 ```
 
-The pre-trained model files in the repository let you skip the first four commands, but they were produced with the author's own images and camera, so results with a different setup are not guaranteed.
+The repository ships `data.pickle`, `model.p`, `deep_model.h5` and `label_encoder.pkl`, so the collection, dataset and training commands can be skipped to try the inference scripts directly. How well they generalize to another camera or setup was not tested.
 
 ## Repository layout
 
